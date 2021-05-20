@@ -1,0 +1,144 @@
+# config file gen by iyfiysi at 2021 May 19
+
+app: "short_url"
+version: "v1.0.0" # 版本，由于服务治理是基于app/version作为前缀key的，是以若是提供一样的服务，可以不变，否则变之
+token: "7625C007783D1B09F2522E3F0A533404" # gateway->server调用认证
+limit: 1000
+
+# 服务启动会根据ip和port自己寻找合适的ip和端口使用来启动服务
+# 先从ignoreIP列表中过滤掉不用的ip，再根据potentialIP次第寻找可用ip
+ignoreIP: &ignoreIPRef
+  - "10.*.*.1"
+  - "172.*.*.1"
+  - "192.168.*.1"
+potentialIP: &potentialIPRef
+  - "172.30.0.14" #此列表也是有优先级的，第一个是最优先的，也支持172.30.0.*这种掩码格式的ip配置
+  - "127.0.0.1"
+
+# gateway service,不支持即改即生效
+gateway:
+  minPort: 8000
+  maxPort: 8050
+  ignoreIP:
+    *ignoreIPRef
+  potentialIP:
+    *potentialIPRef
+
+# server service,不支持即改即生效
+server:
+  minPort: 30000
+  maxPort: 30500
+  ignoreIP:
+    *ignoreIPRef
+  potentialIP:
+    *potentialIPRef
+
+metrics:
+  enable: true # 是否开启监控
+  gateway:
+    path: "/metrics"
+    minPort: 41000
+    maxPort: 41500
+    ignoreIP:
+      *ignoreIPRef
+    potentialIP:
+      *potentialIPRef
+  server:
+    path: "/metrics"
+    minPort: 42000
+    maxPort: 42500
+    ignoreIP:
+      *ignoreIPRef
+    potentialIP:
+      *potentialIPRef
+
+# etcd,不支持即改即生效
+etcd:
+  enable: true #是否开启etcd服务，目前只能开启
+  serviceKey: "/short_url/v1.0.0" #注册服务时候的key
+  etcdServer:
+    - "http://127.0.0.1:2379"
+
+
+# jaeger,不支持即改即生效
+jaeger:
+  enable: true
+  jaegerServer:
+    - "localhost:6831"
+
+
+# keystore,不支持即改即生效
+keystore:
+  serverName: "dnsiyfiysi" # gateway->server的域名（此和证书生成相关，不要乱改）
+  ca: "keystore/ca.crt" #root证书
+  public: "keystore/grpc.crt" #公钥
+  private: "keystore/grpc.key" #密钥
+
+# 日志信息,不支持即改即生效
+logger:
+  - name: "main" #主日志
+    file: "./logs/main.log"
+    level: "debug" #debug|info|warning|error
+  - name: "http" #审计日志
+    file: "./logs/http.log"
+    level: "debug"
+  - name: "api" #api调用日志
+    file: "./logs/api.log"
+    level: "debug"
+  - name: "db" #db请求日志
+    file: "./logs/db.log"
+    level: "debug"
+  - name: "grpc" #grpc请求日志
+    file: "./logs/grpc.log"
+    level: "debug"
+
+snowflakeNodeID: 0 #snowflake需要的node参数
+
+
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  pass: "root"
+  db: "short_url"
+  reloadCron: "*/5 * * * *" #重新加载db数据cron配置，以linux的crontab样式为准
+
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  pass: ""
+  db: 0
+  # 业务配置
+
+
+incID: #id编码配置
+  incIDStartAt: 10000 # 自增id从那个地方开始
+  incIDLockKey: "incIDLockKey" #这是分布式锁，每次要自增id时候，其都需要先获取锁
+  incIDLockMS: 1000 #分布式锁锁的时间，单位是ms
+  incIDKey: "incID"
+  incBy: 1000 #单个进程中，每次新加id的库存量
+  reloadWhen: 50 #id库存低于这个值时候，重新装库
+
+phraseID: #短语编码配置
+  minLen: 1 #最小字符要大于等于1个
+  maxLen: 11 #最大不超过11个字符（包括11）
+  phraseSetKey: "phraseSetKey" #通过短语生成的短码redis的集合(set)的key
+
+
+# 外部url（即用户的url）相关的配置
+link:
+  doCheck: true #是否检测url合法，因为这个比较耗时的
+
+
+# 本服务的url相关的配置
+url:
+  domain: "https://surl4.me/"
+  itemPrefix: "urlInfo_" #每个urlInfo在redis中的前缀，完整的key=urlInfo_${short_code}
+  itemExpireInRedis: 300 #每个urlInfo在redis中保存多久，单位为秒
+  localCacheNum: 10000 #本地缓存最大条数
+  localCacheExpire: 30 #本地缓存过期时间，单位为秒
+  redisCacheExpire: 300 #redis缓存过期时间，单位为秒
+  pubsubKey: "urlInfoChangePubSub"
+
+# end

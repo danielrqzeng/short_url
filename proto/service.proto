@@ -1,0 +1,103 @@
+// gen by iyfiysi at 2021 May 19
+syntax = "proto3";
+package proto;
+option go_package = "proto";
+import "google/api/annotations.proto";
+
+message PingRequest {
+    string value = 1;
+}
+
+message PongResponse {
+    string value = 1;
+}
+
+
+message EncodeRequest {
+    string link = 1; //原始连接
+}
+
+message EncodeResponse {
+    int32 retCode = 1; //0:成功，其他失败
+    string retMsg = 2; //对retCode的描述
+    string msgShow = 3; //显示什么信息
+    string shortUrl = 4; //如果成功，短连接
+}
+
+
+message EncodeWithPhraseRequest {
+    string link = 1; //原始连接
+    string phrase = 2; //用户想要使用的短语
+}
+
+message EncodeWithPhraseResponse {
+    int32 retCode = 1; //0:成功，其他失败
+    string retMsg = 2; //对retCode的描述
+    string msgShow = 3; //显示什么信息
+    string shortUrl = 4; //如果成功，短连接
+}
+
+message DecodeRequest {
+    string shortCode = 4; //短连接
+}
+
+message DecodeResponse {
+    int32 retCode = 1; //0:成功，其他失败
+    string retMsg = 2; //对retCode的描述
+    string link = 3; //原始连接
+}
+
+
+message BanRequest {
+    string shortCode = 4; //短连接
+}
+
+message BanResponse {
+    int32 retCode = 1; //0:成功，其他失败
+    string retMsg = 2; //对retCode的描述
+    string msgShow = 3; //显示什么信息
+}
+
+service short_urlService {
+    rpc PingPong (PingRequest) returns (PongResponse) {
+        option (google.api.http) = {
+            post: "/pingpong/v1"
+            body: "*"
+            //additional_bindings {
+            //  post: "/example/echo/v2"
+            //  body: "*"
+            //}
+        };
+    }
+
+    //Encode 长连接转短连接
+    rpc Encode (EncodeRequest) returns (EncodeResponse) {
+        option (google.api.http) = {
+            post: "/encode/v1"
+            body: "*"
+        };
+    }
+
+    //EncodeWithPhrase 长连接转短连接
+    rpc EncodeWithPhrase (EncodeWithPhraseRequest) returns (EncodeWithPhraseResponse) {
+        option (google.api.http) = {
+            post: "/phraseencode/v1"
+            body: "*"
+        };
+    }
+
+    //Decode 解码
+    rpc Decode (DecodeRequest) returns (DecodeResponse) {
+        option (google.api.http) = {
+            get: "/{shortCode}"
+        };
+    }
+
+    //Ban 禁用
+    rpc Ban (BanRequest) returns (BanResponse) {
+        option (google.api.http) = {
+            post: "/ban/v1"
+            body: "*"
+        };
+    }
+}

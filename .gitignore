@@ -1,0 +1,6 @@
+.idea
+*.logs
+.DS_Store
+proto/service.pb.go
+proto/service.pb.gw.go
+

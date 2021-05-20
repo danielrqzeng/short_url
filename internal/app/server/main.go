@@ -1,0 +1,163 @@
+// gen by iyfiysi at 2021 May 19
+
+package server
+
+import (
+	"context"
+	"fmt"
+	"github.com/coreos/etcd/clientv3"
+	etcdNaming "github.com/coreos/etcd/clientv3/naming"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/naming"
+	"google.golang.org/grpc/reflection"
+	"iyfiysi.com/short_url/internal/app/server/service"
+	"iyfiysi.com/short_url/internal/pkg/governance"
+	"iyfiysi.com/short_url/internal/pkg/interceptor"
+	realService "iyfiysi.com/short_url/internal/pkg/service"
+	"iyfiysi.com/short_url/internal/pkg/trace"
+	"net/http"
+	"sync"
+)
+
+var (
+	appSingleton *ApplicationType
+	appOnce      sync.Once
+)
+
+//Mgr 拦截器管理实例
+func App() *ApplicationType {
+	appOnce.Do(func() {
+		appSingleton = &ApplicationType{}
+		appSingleton.Init()
+	})
+	return appSingleton
+}
+
+//ApplicationType server app定义
+type ApplicationType struct {
+	serviceAddr string // 侦听地址，格式如：127.0.0.1:8000
+	metricAddr  string // 监控侦听地址，格式如：127.0.0.1:8000
+}
+
+//Init ...
+func (app *ApplicationType) Init() {
+}
+
+//GrpcServer ...
+func (app *ApplicationType) grpcServer() (server *grpc.Server, err error) {
+	interceptors := interceptor.Mgr().GetServerInterceptors()
+	server = grpc.NewServer(grpc.UnaryInterceptor(interceptors))
+
+	//注册服务
+	err = service.DoRegister(server)
+	if err != nil {
+		return
+	}
+	//注册监控
+	grpc_prometheus.Register(server)
+	grpc_prometheus.EnableHandlingTimeHistogram()
+
+	//注册grpc反射（给grpcurl使用）
+	reflection.Register(server)
+	return
+}
+
+//runGRPC grpc服务
+func (app *ApplicationType) runGRPC() (err error) {
+	instance, err := governance.GetSetupInstanceAddrByConfKey("server")
+	if err != nil {
+		return
+	}
+
+	// 将server的服务侦听地址设置到viper中（以备其他地方使用），key为listen
+	app.serviceAddr = instance
+	viper.Set("listen", app.serviceAddr)
+	trace.Init() // 对opentracing.GlobalTracer() 重新初始化，使得侦听实例在trace的tag中生效
+
+	//服务治理之注册
+	serviceKey := viper.GetString("etcd.serviceKey")
+	cli, err := governance.DefaultEtcdV3Client()
+	if err != nil {
+		return
+	}
+	e := &governance.EtcdType{}
+	err = e.RunToKeepAlive(cli, serviceKey,
+		func(leaseID clientv3.LeaseID) {
+			ops := clientv3.WithLease(leaseID)
+			r := &etcdNaming.GRPCResolver{Client: cli}
+			err = r.Update(context.TODO(), serviceKey,
+				naming.Update{Op: naming.Add, Addr: instance, Metadata: "..."},
+				ops)
+		},
+		func(code int, msg string) {
+			fmt.Println("serviceKey=", serviceKey, ",code=", code, ",msg=", msg)
+		})
+
+	if err != nil {
+		return
+	}
+
+	server, err := app.grpcServer()
+	if err != nil {
+		return
+	}
+
+	keystorePublicKey := viper.GetString("keystore.public")
+	keystorePrivateKey := viper.GetString("keystore.private")
+	err = http.ListenAndServeTLS(instance,
+		keystorePublicKey,
+		keystorePrivateKey,
+		server,
+		//http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//	if r.ProtoMajor == 2 &&
+		//		strings.Contains(
+		//			r.Header.Get("Content-Type"), "application/grpc") {
+		//		server.ServeHTTP(w, r)
+		//	}
+		//	return
+		//}),
+	)
+	return
+}
+
+//runMetricsHTTP metric服务
+func (app *ApplicationType) runMetricsHTTP() {
+	if !viper.GetBool("metrics.enable") {
+		return
+	}
+
+	instance, err := governance.GetSetupInstanceAddrByConfKey("metrics.server")
+	if err != nil {
+		panic(err)
+	}
+	app.metricAddr = instance
+
+	metricsPath := viper.GetString("metrics.server.path")
+	httpMux := http.NewServeMux()
+	httpMux.Handle(metricsPath, promhttp.HandlerFor(
+		prometheus.DefaultGatherer,
+		promhttp.HandlerOpts{},
+	))
+
+	// Start HTTP server (and proxy calls to gRPC server endpoint)
+	err = http.ListenAndServe(instance, httpMux)
+	return
+}
+
+//Run 启动
+func (app *ApplicationType) Run() (err error) {
+	//metrics
+	go app.runMetricsHTTP()
+
+	realService.Init()
+	//grpc
+	err = app.runGRPC()
+	if err != nil {
+		return
+	}
+	return
+}
