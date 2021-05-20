@@ -5,6 +5,8 @@ package service
 
 import (
 	"context"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"iyfiysi.com/short_url/internal/pkg/service"
 	pb "iyfiysi.com/short_url/proto"
 )
@@ -23,7 +25,9 @@ func (s *ShortUrlServiceImpl) Decode(
 	}
 	rsp.RetCode = 0
 	rsp.RetMsg = "success"
-	rsp.Link=link
+	rsp.Link = link
 
+	header := metadata.Pairs("Location", rsp.Link)
+	grpc.SendHeader(ctx, header)
 	return
 }

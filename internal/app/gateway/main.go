@@ -5,6 +5,7 @@ package gateway
 import (
 	"context"
 	etcdNaming "github.com/coreos/etcd/clientv3/naming"
+	"github.com/golang/protobuf/proto"
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/prometheus/client_golang/prometheus"
@@ -45,9 +46,21 @@ type ApplicationType struct {
 func (app *ApplicationType) Init() {
 }
 
+// responseHeaderMatcher 302重定向
+func responseHeaderMatcher(
+	ctx context.Context, w http.ResponseWriter, rsp proto.Message) error {
+	headers := w.Header()
+	if location, ok := headers["Grpc-Metadata-Location"]; ok {
+		w.Header().Set("Location", location[0])
+		w.WriteHeader(http.StatusFound)
+	}
+
+	return nil
+}
+
 //grpcServer ...
 func (app *ApplicationType) grpcServer() (gwMux *runtime.ServeMux) {
-	gwMux = runtime.NewServeMux()
+	gwMux = runtime.NewServeMux(runtime.WithForwardResponseOption(responseHeaderMatcher))
 
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
@@ -145,7 +158,6 @@ func (app *ApplicationType) runMetricsHTTP() {
 func (app *ApplicationType) Run() (err error) {
 	//metrics
 	go app.runMetricsHTTP()
-
 
 	//grpc
 	err = app.runGRPC()
