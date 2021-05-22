@@ -34,3 +34,10 @@ var URLInfoPool = sync.Pool{
 		return new(URLInfo)
 	},
 }
+
+//BaseResponse 通用回应
+type BaseResponse struct {
+	RetCode int32  `json:"retCode"` //0:成功，其他失败
+	RetMsg  string `json:"retMsg"`  //对retCode的描述
+	MsgShow string `json:"msgShow"` //显示什么信息
+}

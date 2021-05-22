@@ -51,7 +51,7 @@ func (mgr *MgrInstanceType) GetHttpInterceptors(h http.Handler,
 	if viper.GetBool("metrics.enable") {
 		httpInterceptor.InterceptorMgr().Use(httpInterceptor.Metrics)
 	}
-	httpInterceptor.InterceptorMgr().Use(httpInterceptor.Cors)
+	//httpInterceptor.InterceptorMgr().Use(httpInterceptor.Cors)
 	httpInterceptor.InterceptorMgr().Use(httpInterceptor.Trace)
 	httpInterceptor.InterceptorMgr().Use(httpInterceptor.Query)
 	return httpInterceptor.InterceptorMgr().Handler(h)

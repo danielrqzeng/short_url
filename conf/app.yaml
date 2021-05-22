@@ -133,7 +133,8 @@ link:
 
 # 本服务的url相关的配置
 url:
-  domain: "https://surl4.me/"
+#  domain: "https://surl4.me/"
+  domain: "http://129.28.162.42:8000/"
   itemPrefix: "urlInfo_" #每个urlInfo在redis中的前缀，完整的key=urlInfo_${short_code}
   itemExpireInRedis: 300 #每个urlInfo在redis中保存多久，单位为秒
   localCacheNum: 10000 #本地缓存最大条数
@@ -141,4 +142,5 @@ url:
   redisCacheExpire: 300 #redis缓存过期时间，单位为秒
   pubsubKey: "urlInfoChangePubSub"
 
+indexFile: "index_zip.html" # internal/pkg/html/*.html--statik-->fs--->index_zip.html
 # end

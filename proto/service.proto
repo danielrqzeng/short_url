@@ -18,7 +18,7 @@ message EncodeRequest {
 }
 
 message EncodeResponse {
-    int32 retCode = 1; //0:成功，其他失败
+    int32 retCode = 1; //>=0:成功，其他失败
     string retMsg = 2; //对retCode的描述
     string msgShow = 3; //显示什么信息
     string shortUrl = 4; //如果成功，短连接
@@ -31,7 +31,7 @@ message EncodeWithPhraseRequest {
 }
 
 message EncodeWithPhraseResponse {
-    int32 retCode = 1; //0:成功，其他失败
+    int32 retCode = 1; //>=0:成功，其他失败
     string retMsg = 2; //对retCode的描述
     string msgShow = 3; //显示什么信息
     string shortUrl = 4; //如果成功，短连接
@@ -42,7 +42,7 @@ message DecodeRequest {
 }
 
 message DecodeResponse {
-    int32 retCode = 1; //0:成功，其他失败
+    int32 retCode = 1; //>=0:成功，其他失败
     string retMsg = 2; //对retCode的描述
     string link = 3; //原始连接
 }
@@ -53,7 +53,7 @@ message BanRequest {
 }
 
 message BanResponse {
-    int32 retCode = 1; //0:成功，其他失败
+    int32 retCode = 1; //>=0:成功，其他失败
     string retMsg = 2; //对retCode的描述
     string msgShow = 3; //显示什么信息
 }

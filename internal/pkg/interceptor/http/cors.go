@@ -19,7 +19,7 @@ func Cors(
 		w.Header().Add(
 			"Access-Control-Allow-Methods",
 			"POST, GET, OPTIONS, PUT, DELETE") //允许请求方法
-		w.Header().Set("content-type", "application/json;charset=UTF-8") //返回数据格式是json
+		//w.Header().Set("content-type", "application/json;charset=UTF-8") //返回数据格式是json
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusNoContent)
 			return

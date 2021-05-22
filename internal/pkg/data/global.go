@@ -16,4 +16,6 @@ const (
 	PhraseTypeNone   = 0 //短语类型-无
 	PhraseTypeWord   = 1 //短语类型-短语
 	PhraseTypeRegexp = 2 //短语类型-正则表达式
+
+	IndexRequestErr = "redirect to index"
 )

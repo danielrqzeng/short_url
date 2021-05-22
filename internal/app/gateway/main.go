@@ -4,18 +4,24 @@ package gateway
 
 import (
 	"context"
+	"encoding/json"
 	etcdNaming "github.com/coreos/etcd/clientv3/naming"
 	"github.com/golang/protobuf/proto"
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
+	"io/ioutil"
 	"iyfiysi.com/short_url/internal/app/gateway/service"
+	"iyfiysi.com/short_url/internal/pkg/data"
 	"iyfiysi.com/short_url/internal/pkg/governance"
 	"iyfiysi.com/short_url/internal/pkg/interceptor"
 	grpcInterceptor "iyfiysi.com/short_url/internal/pkg/interceptor/grpc"
+	"iyfiysi.com/short_url/internal/pkg/logger"
 	"iyfiysi.com/short_url/internal/pkg/trace"
 	"iyfiysi.com/short_url/internal/pkg/utils"
 	"net/http"
@@ -46,9 +52,40 @@ type ApplicationType struct {
 func (app *ApplicationType) Init() {
 }
 
-// responseHeaderMatcher 302重定向
+func writeRoot(w http.ResponseWriter) (err error) {
+	rootIndexFile := viper.GetString("indexFile")
+	//byteFile, err := utils.ReadFileAsByte(rootIndexFile)
+	//if err != nil {
+	//	logger.MainLogger.Error(err.Error())
+	//	return err
+	//}
+	//w.Write(byteFile)
+
+	statikFS, err := fs.New()
+	if err != nil {
+		logger.MainLogger.Error(err.Error())
+		return
+	}
+	r, err := statikFS.Open("/" + rootIndexFile)
+	if err != nil {
+		logger.MainLogger.Error(err.Error())
+		return
+	}
+	defer r.Close()
+	contents, err := ioutil.ReadAll(r)
+	if err != nil {
+		logger.MainLogger.Error(err.Error())
+		return
+	}
+
+	w.Write(contents)
+	return nil
+}
+
+//responseHeaderMatcher 相应头部,将decode出来的，做成重定向返回
 func responseHeaderMatcher(
 	ctx context.Context, w http.ResponseWriter, rsp proto.Message) error {
+	logger.MainLogger.Error("responseHeaderMatcher mark")
 	headers := w.Header()
 	if location, ok := headers["Grpc-Metadata-Location"]; ok {
 		w.Header().Set("Location", location[0])
@@ -58,9 +95,42 @@ func responseHeaderMatcher(
 	return nil
 }
 
+//OnProtoErrorHandlerFunc pb方法报错时候，进入此处处理
+func OnProtoErrorHandlerFunc(
+	ctx context.Context,
+	mux *runtime.ServeMux,
+	marshaler runtime.Marshaler,
+	w http.ResponseWriter,
+	request *http.Request, e error) {
+
+	//"rpc error: code = Unknown desc = not valid link"
+	grpcErr := status.Convert(e)
+	//定向到主页
+	if grpcErr.Message() == data.IndexRequestErr {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Del("Content-Type")
+		w.Header().Add("Content-Type", "text/html;charset=utf-8")
+		writeRoot(w)
+		return
+	}
+	//其他的错误，返回json
+	rsp := &data.BaseResponse{}
+	rsp.RetCode = -1
+	rsp.RetMsg = e.Error()
+	rsp.MsgShow = grpcErr.Message()
+	byteStr, err := json.Marshal(rsp)
+
+	if err == nil {
+		w.Write(byteStr)
+	}
+	return
+}
+
 //grpcServer ...
 func (app *ApplicationType) grpcServer() (gwMux *runtime.ServeMux) {
-	gwMux = runtime.NewServeMux(runtime.WithForwardResponseOption(responseHeaderMatcher))
+	gwMux = runtime.NewServeMux(
+		runtime.WithForwardResponseOption(responseHeaderMatcher),
+		runtime.WithProtoErrorHandler(OnProtoErrorHandlerFunc))
 
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)

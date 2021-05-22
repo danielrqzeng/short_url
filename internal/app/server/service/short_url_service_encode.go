@@ -22,7 +22,7 @@ func (s *ShortUrlServiceImpl) Encode(
 		rsp.MsgShow = ""
 		return
 	}
-	rsp.RetCode = 0
+	rsp.RetCode = 1
 	rsp.RetMsg = "success"
 	rsp.MsgShow = "success"
 	rsp.ShortUrl = shortUrl

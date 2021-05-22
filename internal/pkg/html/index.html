@@ -1,0 +1,512 @@
+<html>
+<header>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <style type="text/css">
+        .ant-input {
+            font-family: "Monospaced Number", "Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            position: relative;
+            display: inline-block;
+            padding: 4px 11px;
+            width: 100%;
+            height: 32px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(0, 0, 0, 0.65);
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            transition: all .3s;
+        }
+
+        .ant-input::-moz-placeholder {
+            color: #bfbfbf;
+            opacity: 1;
+        }
+
+        .ant-input:-ms-input-placeholder {
+            color: #bfbfbf;
+        }
+
+        .ant-input::-webkit-input-placeholder {
+            color: #bfbfbf;
+        }
+
+        .ant-input:hover {
+            border-color: #40a9ff;
+            border-right-width: 1px !important;
+        }
+
+        .ant-input:focus {
+            border-color: #40a9ff;
+            outline: 0;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            border-right-width: 1px !important;
+        }
+
+
+        textarea.ant-input {
+            max-width: 30%;
+            height: 40px;
+            vertical-align: bottom;
+            transition: all .3s, height 0s;
+            min-height: 32px;
+            text-align: center;
+        }
+
+        .ant-input-lg {
+            padding: 6px 11px;
+            height: 40px;
+            font-size: 16px;
+        }
+
+        .ant-input-affix-wrapper {
+            font-family: "Monospaced Number", "Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(0, 0, 0, 0.65);
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            /*up right down left*/
+            list-style: none;
+            position: relative;
+            display: inline-block;
+            width: 60%;
+        }
+
+        .ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled) {
+            border-color: #40a9ff;
+            border-right-width: 1px !important;
+        }
+
+        .ant-input-affix-wrapper .ant-input {
+            position: static;
+        }
+
+        .ant-input-affix-wrapper .ant-input-suffix {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            line-height: 0;
+            color: rgba(0, 0, 0, 0.65);
+        }
+
+
+        .ant-input-affix-wrapper .ant-input-suffix :not(.anticon) {
+            line-height: 1.5;
+        }
+
+
+        .ant-input-affix-wrapper .ant-input-suffix {
+            right: 12px;
+        }
+
+        .ant-input-affix-wrapper .ant-input:not(:first-child) {
+            padding-left: 30px;
+        }
+
+        .ant-input-affix-wrapper .ant-input:not(:last-child) {
+            padding-right: 30px;
+        }
+
+        .ant-input-affix-wrapper .ant-input {
+            min-height: 32px;
+        }
+
+        .ant-input-search:not(.ant-input-search-small) > .ant-input-suffix {
+            right: 12px;
+        }
+
+        .ant-input-search > .ant-input-suffix > .ant-input-search-button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .ant-input-search > .ant-input-suffix > .ant-input-search-button > .anticon-search {
+            font-size: 16px;
+        }
+
+        .ant-input-search.ant-input-search-enter-button > .ant-input {
+            padding-right: 46px;
+        }
+
+        .ant-input-search.ant-input-search-enter-button > .ant-input-suffix {
+            right: 0;
+        }
+
+        /* button */
+        .ant-btn {
+            line-height: 1.5;
+            display: inline-block;
+            font-weight: 400;
+            text-align: center;
+            touch-action: manipulation;
+            cursor: pointer;
+            background-image: none;
+            border: 1px solid transparent;
+            white-space: nowrap;
+            padding: 0 15px;
+            font-size: 14px;
+            border-radius: 4px;
+            height: 32px;
+            user-select: none;
+            transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+            position: relative;
+            color: rgba(0, 0, 0, 0.65);
+            background-color: #fff;
+            border-color: #d9d9d9;
+        }
+
+        .ant-btn > .anticon {
+            line-height: 1;
+        }
+
+        .ant-btn,
+        .ant-btn:active,
+        .ant-btn:focus {
+            outline: 0;
+        }
+
+        .ant-btn:not([disabled]):hover {
+            text-decoration: none;
+        }
+
+        .ant-btn:not([disabled]):active {
+            outline: 0;
+            transition: none;
+        }
+
+        .ant-btn.disabled,
+        .ant-btn[disabled] {
+            cursor: not-allowed;
+        }
+
+        .ant-btn.disabled > *,
+        .ant-btn[disabled] > * {
+            pointer-events: none;
+        }
+
+        .ant-btn-lg {
+            padding: 0 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            height: 40px;
+        }
+
+        .ant-btn > a:only-child {
+            color: currentColor;
+        }
+
+        .ant-btn > a:only-child:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: transparent;
+        }
+
+        .ant-btn:hover,
+        .ant-btn:focus {
+            color: #40a9ff;
+            background-color: #fff;
+            border-color: #40a9ff;
+        }
+
+        .ant-btn:hover > a:only-child,
+        .ant-btn:focus > a:only-child {
+            color: currentColor;
+        }
+
+        .ant-btn:hover > a:only-child:after,
+        .ant-btn:focus > a:only-child:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: transparent;
+        }
+
+        .ant-btn:active,
+        .ant-btn.active {
+            color: #096dd9;
+            background-color: #fff;
+            border-color: #096dd9;
+        }
+
+        .ant-btn:active > a:only-child,
+        .ant-btn.active > a:only-child {
+            color: currentColor;
+        }
+
+        .ant-btn:active > a:only-child:after,
+        .ant-btn.active > a:only-child:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: transparent;
+        }
+
+        .ant-btn:hover,
+        .ant-btn:focus,
+        .ant-btn:active,
+        .ant-btn.active {
+            background: #fff;
+            text-decoration: none;
+        }
+
+        .ant-btn > i,
+        .ant-btn > span {
+            pointer-events: none;
+        }
+
+        .ant-btn-primary {
+            color: #fff;
+            background-color: #1890ff;
+            border-color: #1890ff;
+        }
+
+        .ant-btn-primary > a:only-child {
+            color: currentColor;
+        }
+
+        .ant-btn-primary > a:only-child:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: transparent;
+        }
+
+        .ant-btn-primary:hover,
+        .ant-btn-primary:focus {
+            color: #fff;
+            background-color: #40a9ff;
+            border-color: #40a9ff;
+        }
+
+        .ant-btn-primary:hover > a:only-child,
+        .ant-btn-primary:focus > a:only-child {
+            color: currentColor;
+        }
+
+        .ant-btn-primary:hover > a:only-child:after,
+        .ant-btn-primary:focus > a:only-child:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: transparent;
+        }
+
+        .ant-btn-primary:active,
+        .ant-btn-primary.active {
+            color: #fff;
+            background-color: #096dd9;
+            border-color: #096dd9;
+        }
+
+        .ant-btn-primary:active > a:only-child,
+        .ant-btn-primary.active > a:only-child {
+            color: currentColor;
+        }
+
+        .ant-btn-primary:active > a:only-child:after,
+        .ant-btn-primary.active > a:only-child:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: transparent;
+        }
+
+        .ant-btn:before {
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            bottom: -1px;
+            right: -1px;
+            background: #fff;
+            opacity: 0.35;
+            content: '';
+            border-radius: inherit;
+            z-index: 1;
+            transition: opacity .2s;
+            pointer-events: none;
+            display: none;
+        }
+
+        .ant-btn:focus > span,
+        .ant-btn:active > span {
+            position: relative;
+        }
+
+        .box {
+            width: 80%;
+            margin: 15% auto auto auto;
+            /* 上边下边 | 左边右边 */
+            /* 上边 | 左边右边 | 下边 */
+            /* 上边 | 右边 | 下边 | 左边 */
+            text-align: center
+        }
+
+
+        .copyright {
+            width: 50%;
+            margin: 0 auto 20px;
+            /* 上边下边 | 左边右边 */
+            /* 上边 | 左边右边 | 下边 */
+            /* 上边 | 右边 | 下边 | 左边 */
+            text-align: center;
+        }
+
+        .red.big {
+            color: red;
+        }
+
+        .big.green {
+            color: green;
+        }
+
+        .big.orange {
+            color: orange;
+        }
+
+        .big.blue {
+            color: skyblue;
+        }
+
+        .big {
+            font-size: xx-large;
+        }
+
+        p.big, #short_url {
+            display: inline;
+        }
+
+        .box .hide {
+            /* display: none; */
+            visibility: hidden;
+        }
+
+        #input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            z-index: -10;
+        }
+    </style>
+    <script>
+        function on_request() {
+            xmlHttp = new XMLHttpRequest();
+            var obj = {
+                "link": ""
+            }
+            var raw_link = document.getElementById('raw_link').value;
+            obj["link"] = raw_link;
+
+            //  post
+            xmlHttp.open("post", "encode/v1");
+            xmlHttp.setRequestHeader("Content-Type", "application/json");
+            // （4） 回调函数  success
+            xmlHttp.onreadystatechange = function () {
+                if (this.status == 200) {
+                    console.log("responseText", this.responseText);
+                    var rsp = JSON.parse(this.responseText);
+                    /*
+                    rsp={
+                        "retCode":0,
+                        "retMsg":"",
+                        "msgShow":"",
+                        "shortUrl":"",
+                    }
+                     */
+                    console.log(rsp)
+                    if (rsp["retCode"] < 0) {
+                        document.getElementById('short_url').innerHTML = rsp["msgShow"];
+                        document.getElementById('short_url').style.color = "red";
+                        document.getElementById('short_url').style.visibility = "visible";
+                        return
+                    }
+                    shortUrl = rsp['shortUrl'];
+                    document.getElementById('short_url').innerHTML = shortUrl
+                    document.getElementById('short_url').style.color = "red";
+                    document.getElementById('short_url').style.visibility = "visible";
+                    document.getElementById('cp').style.visibility = "visible";
+                }else{
+                    document.getElementById('short_url').innerHTML = "系统出错";
+                    document.getElementById('short_url').style.color = "red";
+                    document.getElementById('short_url').style.visibility = "visible";
+                    return
+                }
+            };
+            xmlHttp.send(JSON.stringify(obj));   // 请求体数据
+
+
+        }
+
+        function on_cp() {
+            var rawText = document.getElementById("short_url").innerText;
+            var input = document.getElementById("input");
+            input.innerText = rawText;
+            input.select();
+            document.execCommand("copy");
+            alert("复制成功");
+        }
+    </script>
+</header>
+
+<body>
+<div class="box">
+    <div>
+        <p class="big">短网址 </p>
+        <p class="big blue">i</p>
+        <p class="big">YF</p>
+        <p class="big red">i</p>
+        <p class="big">YS</p>
+        <p class="big orange">i</p>
+    </div>
+    <br/>
+    <span class="ant-input-search ant-input-search-enter-button ant-input-affix-wrapper">
+        <input id="raw_link" type="text" placeholder="请输入长网址" class="ant-input ant-input-lg">
+            <span class="ant-input-suffix">
+            <button type="button" onclick="on_request()"
+                    class="ant-btn ant-input-search-button ant-btn-primary ant-btn-lg">
+                <span>缩短网址</span>
+    </button>
+    </span>
+    </span>
+    <br/>
+    <br/>
+    <textarea id="input"></textarea>
+    <p id="short_url" class="hide"></p>
+    <button id="cp" onclick="on_cp()" class="ant-btn ant-input-search-button ant-btn-primary ant-btn-lg hide">复制
+    </button>
+</div>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<div class="copyright">©<!-- --> 2021<!-- --> IYFIYSI. All Rights Reserved.</div>
+</body>
+
+</html>

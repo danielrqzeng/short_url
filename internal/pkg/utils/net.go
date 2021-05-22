@@ -131,7 +131,6 @@ func ipInRange(ip string, rangeMin, rangeMax int64) (yes bool, err error) {
 	if err != nil {
 		return
 	}
-	fmt.Println(ip, ipInt, rangeMin, rangeMax)
 	if ipInt >= rangeMin && ipInt <= rangeMax {
 		yes = true
 	}

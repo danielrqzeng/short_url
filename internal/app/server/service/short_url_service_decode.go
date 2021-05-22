@@ -5,9 +5,13 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"iyfiysi.com/short_url/internal/pkg/data"
+	"iyfiysi.com/short_url/internal/pkg/logger"
 	"iyfiysi.com/short_url/internal/pkg/service"
+	"iyfiysi.com/short_url/internal/pkg/utils"
 	pb "iyfiysi.com/short_url/proto"
 )
 
@@ -16,17 +20,29 @@ func (s *ShortUrlServiceImpl) Decode(
 	ctx context.Context, req *pb.DecodeRequest) ( //request param
 	rsp *pb.DecodeResponse, err error) { //response
 
+	logger.MainLogger.Error(utils.Struct2Str(req))
 	rsp = &pb.DecodeResponse{}
+
+	//如果请求的是主目录，则报错给gateway做处理，gateway的处理逻辑在app/gateway/main.go:OnProtoErrorHandlerFunc
+	if req.ShortCode == "" || req.ShortCode == "index.html" {
+		err = fmt.Errorf(data.IndexRequestErr)
+		return
+	}
+	logger.MainLogger.Error("mark")
+
 	link, err := service.DecodeMgr().Decode(req.ShortCode)
 	if err != nil {
 		rsp.RetCode = -1
 		rsp.RetMsg = err.Error()
 		return
 	}
+	logger.MainLogger.Error("mark")
+
 	rsp.RetCode = 0
 	rsp.RetMsg = "success"
 	rsp.Link = link
 
+	//加一个头字段，以便gateway做重定向，gateway在app/gateway/main.go:responseHeaderMatcher
 	header := metadata.Pairs("Location", rsp.Link)
 	grpc.SendHeader(ctx, header)
 	return

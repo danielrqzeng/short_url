@@ -2,6 +2,9 @@
 #Copyright (C) 2020 iyfiysi
 #gen by iyfiysi at 2021 May 19
 
+# 生成internal/pkg/html文件（默认不开启）
+statik -src=internal/pkg/html -dest=internal/pkg -p=data
+
 # pb构建
 cd proto
 sh gen.sh
