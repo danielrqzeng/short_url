@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `t_kv_info` (
 	`create_ts`	      int(10) unsigned	  NOT NULL DEFAULT 0 COMMENT '创建时间',
 	`version`	        int(10) unsigned 	  NOT NULL DEFAULT 0 COMMENT '数据版本,cas update辅佐作用',
 	PRIMARY KEY (`key_info`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
