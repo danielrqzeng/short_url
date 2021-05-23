@@ -3,7 +3,7 @@ module iyfiysi.com/short_url
 go 1.13
 
 require (
-	github.com/RQZeng/num-shuffle v0.0.0-20210506033248-28794bf465bd
+	github.com/RQZeng/num-shuffle v0.0.0-20210523163605-113cbd11fdbe
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/bwmarrin/snowflake v0.3.0
