@@ -30,8 +30,13 @@ func ToTURLInfo(u *data.URLInfo) (tu *model.TURLInfo) {
 	tu.UrlType = int(u.URLType)
 	tu.Status = int(u.Status)
 
-	tu.BanAt = int(u.BanAt.Unix())
-	tu.UnbanAt = int(u.UnBanAt.Unix())
+	if !u.BanAt.IsZero() {
+		tu.BanAt = int(u.BanAt.Unix())
+		tu.UnbanAt = int(u.UnBanAt.Unix())
+	} else {
+		tu.BanAt = 0
+		tu.UnbanAt = 0
+	}
 	tu.BanCuz = u.BanCuz
 	tu.BanBy = u.BanBy
 
