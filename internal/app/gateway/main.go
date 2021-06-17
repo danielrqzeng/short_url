@@ -5,6 +5,8 @@ package gateway
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/coreos/etcd/clientv3"
 	etcdNaming "github.com/coreos/etcd/clientv3/naming"
 	"github.com/golang/protobuf/proto"
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -46,6 +48,7 @@ func App() *ApplicationType {
 type ApplicationType struct {
 	serviceAddr string // 侦听地址，格式如：127.0.0.1:8000
 	metricAddr  string // 监控侦听地址，格式如：127.0.0.1:8000
+	swaggerAddr string // 文档侦听地址，格式如：127.0.0.1:8080
 }
 
 //Init ...
@@ -212,6 +215,31 @@ func (app *ApplicationType) runMetricsHTTP() {
 	if err != nil {
 		panic(err)
 	}
+
+	//注册-监控主键
+	e := &governance.EtcdType{}
+	cli, err := governance.DefaultEtcdV3Client()
+	if err != nil {
+		panic(err)
+	}
+	metricKey := viper.GetString("etcd.metricKey") + "/gateway/" + instance
+	err = e.RunToKeepAlive(cli, metricKey,
+		func(leaseID clientv3.LeaseID) {
+			ops := clientv3.WithLease(leaseID)
+			_, err := cli.Put(context.TODO(), metricKey, instance, ops)
+			if err != nil {
+				panic(fmt.Sprintf("RunToKeepAlive key=%s err,err=%s", metricKey, err.Error()))
+			}
+		},
+		func(code int, msg string) {
+			panic(fmt.Sprintf("RunToKeepAlive key=%s err,code=%d,msg=%s", metricKey, code, msg))
+		})
+
+	if err != nil {
+		panic(fmt.Sprintf("RunToKeepAlive key=%s err,err=%s", metricKey, err.Error()))
+		return
+	}
+
 	app.metricAddr = instance
 	metricsPath := viper.GetString("metrics.gateway.path")
 	HTTPMux := http.NewServeMux()
@@ -225,9 +253,61 @@ func (app *ApplicationType) runMetricsHTTP() {
 	return
 }
 
+//runSwaggerHTTP swagger服务
+func (app *ApplicationType) runSwaggerHTTP() {
+	if !viper.GetBool("swagger.enable") {
+		return
+	}
+
+	instance, err := governance.GetSetupInstanceAddrByConfKey("swagger")
+	if err != nil {
+		panic(err)
+	}
+	app.swaggerAddr = instance
+
+	//注册-监控主键
+	e := &governance.EtcdType{}
+	cli, err := governance.DefaultEtcdV3Client()
+	if err != nil {
+		panic(err)
+	}
+	etcdKey := viper.GetString("etcd.swaggerKey") + instance
+	err = e.RunToKeepAlive(cli, etcdKey,
+		func(leaseID clientv3.LeaseID) {
+			ops := clientv3.WithLease(leaseID)
+			_, err := cli.Put(context.TODO(), etcdKey, instance, ops)
+			if err != nil {
+				panic(fmt.Sprintf("RunToKeepAlive key=%s err,err=%s", etcdKey, err.Error()))
+			}
+		},
+		func(code int, msg string) {
+			panic(fmt.Sprintf("RunToKeepAlive key=%s err,code=%d,msg=%s", etcdKey, code, msg))
+		})
+
+	if err != nil {
+		panic(fmt.Sprintf("RunToKeepAlive key=%s err,err=%s", etcdKey, err.Error()))
+		return
+	}
+
+	//swagger
+	statikFS, err := fs.New()
+	if err != nil {
+		return
+	}
+	app.grpcServer()
+	mux := http.NewServeMux()
+	mux.Handle("/", app.grpcServer())
+	swaggerPath := viper.GetString("swagger.path")
+	mux.Handle(swaggerPath,
+		http.StripPrefix(swaggerPath, http.FileServer(statikFS)))
+	go http.ListenAndServe(instance, mux)
+	return
+}
+
 func (app *ApplicationType) Run() (err error) {
 	//metrics
 	go app.runMetricsHTTP()
+	go app.runSwaggerHTTP()
 
 	//grpc
 	err = app.runGRPC()

@@ -1,4 +1,4 @@
-// gen by iyfiysi at 2021 May 19
+// gen by iyfiysi at 2021 Jun 16
 
 package main
 
@@ -20,7 +20,7 @@ import (
 //定义一个全局变量的命令行接收参数
 var (
 	etcdServerFlag = flag.String("etcd", "http://127.0.0.1:2379", `etcd server,split with "," if more than one etcd server`)
-	confKeyFlag    = flag.String("conf_key", "/short_url/config/app.yaml", `etcd conf key`)
+	confKeyFlag    = flag.String("conf_key", "/iyfiysi.com/short_url/config/app.yaml", `etcd conf key`)
 	versionFlag    = flag.Bool("version", false, "print the current version")
 )
 
@@ -37,7 +37,8 @@ func initAll() {
 		strings.Split(*etcdServerFlag, ","),
 		*confKeyFlag,
 		func() {
-			fmt.Println(viper.GetString("version"))
+			viper.Set("updateAt", utils.Now())
+			conf.PrintConf()
 		})
 	if err != nil {
 		panic(err)

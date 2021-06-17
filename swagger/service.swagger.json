@@ -1,0 +1,321 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "service.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/ban/v1": {
+      "post": {
+        "summary": "Ban 禁用",
+        "operationId": "Ban",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoBanResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoBanRequest"
+            }
+          }
+        ],
+        "tags": [
+          "short_urlService"
+        ]
+      }
+    },
+    "/encode/v1": {
+      "post": {
+        "summary": "Encode 长连接转短连接",
+        "operationId": "Encode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoEncodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoEncodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "short_urlService"
+        ]
+      }
+    },
+    "/phraseencode/v1": {
+      "post": {
+        "summary": "EncodeWithPhrase 长连接转短连接",
+        "operationId": "EncodeWithPhrase",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoEncodeWithPhraseResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoEncodeWithPhraseRequest"
+            }
+          }
+        ],
+        "tags": [
+          "short_urlService"
+        ]
+      }
+    },
+    "/pingpong/v1": {
+      "post": {
+        "operationId": "PingPong",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoPongResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoPingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "short_urlService"
+        ]
+      }
+    },
+    "/{shortCode}": {
+      "get": {
+        "summary": "Decode 解码",
+        "operationId": "Decode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoDecodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "shortCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "short_urlService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protoBanRequest": {
+      "type": "object",
+      "properties": {
+        "shortCode": {
+          "type": "string"
+        }
+      }
+    },
+    "protoBanResponse": {
+      "type": "object",
+      "properties": {
+        "retCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "retMsg": {
+          "type": "string"
+        },
+        "msgShow": {
+          "type": "string"
+        }
+      }
+    },
+    "protoDecodeResponse": {
+      "type": "object",
+      "properties": {
+        "retCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "retMsg": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        }
+      }
+    },
+    "protoEncodeRequest": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      }
+    },
+    "protoEncodeResponse": {
+      "type": "object",
+      "properties": {
+        "retCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "retMsg": {
+          "type": "string"
+        },
+        "msgShow": {
+          "type": "string"
+        },
+        "shortUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "protoEncodeWithPhraseRequest": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        },
+        "phrase": {
+          "type": "string"
+        }
+      }
+    },
+    "protoEncodeWithPhraseResponse": {
+      "type": "object",
+      "properties": {
+        "retCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "retMsg": {
+          "type": "string"
+        },
+        "msgShow": {
+          "type": "string"
+        },
+        "shortUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "protoPingRequest": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "protoPongResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

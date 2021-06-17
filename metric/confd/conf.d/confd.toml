@@ -1,0 +1,9 @@
+# gen by iyfiysi at 2021 Jun 16
+# confd config file for iyfiysi.com/short_url
+
+[template]
+src = "confd_yaml.tmpl" # templates/confd_yaml.tmpl
+dest = "${PATH_TO_PROMETHEUS}/config/file_sd/short_url.yaml"
+keys = [
+    "/iyfiysi.com/short_url/metric",
+]

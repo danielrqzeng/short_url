@@ -1,0 +1,24 @@
+# gen by iyfiysi at 2021 Jun 16
+# confd templates file for iyfiysi.com/short_url
+
+
+
+#-------------gateway metric------------------
+{{range gets "/iyfiysi.com/short_url/metric/gateway/*"}}
+- labels:
+    project: "iyfiysi.com/short_url"
+    role: "gateway"
+    instance: "{{.Value}}"
+  targets:
+    - "{{.Value}}"
+{{end}}
+
+#-------------server metric------------------
+{{range gets "/iyfiysi.com/short_url/metric/server/*"}}
+- labels:
+    project: "iyfiysi.com/short_url"
+    role: "server"
+    instance: "{{.Value}}"
+  targets:
+    - "{{.Value}}"
+{{end}}

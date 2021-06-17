@@ -1,4 +1,4 @@
-// gen by iyfiysi at 2021 May 19
+// gen by iyfiysi at 2021 Jun 17
 
 // 这是一个针对文件&目录的操作的包装
 package conf
@@ -8,6 +8,7 @@ import (
 	"github.com/coreos/etcd/clientv3"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 	"iyfiysi.com/short_url/internal/pkg/governance"
 	"iyfiysi.com/short_url/internal/pkg/logger"
 	"iyfiysi.com/short_url/internal/pkg/utils"
@@ -86,6 +87,8 @@ func InitRemoteConfig(etcdAddrs []string,
 	if err != nil {
 		panic(err)
 	}
+	viper.Set("createAt", utils.Now())
+	PrintConf()
 	//监控
 	err = e.RunToWatch(cli,
 		configKey,
@@ -109,4 +112,12 @@ func InitRemoteConfig(etcdAddrs []string,
 		return
 	}
 	return
+}
+
+// PrintConf 将配置信息打印到日志中，默认是延后5s打印
+func PrintConf() {
+	time.AfterFunc(time.Second*time.Duration(5), func() {
+		byteConfInfo, _ := yaml.Marshal(viper.AllSettings())
+		logger.MainLogger.Error("\n" + string(byteConfInfo))
+	})
 }

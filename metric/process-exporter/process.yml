@@ -1,0 +1,7 @@
+# conf file for process-exporter
+# gen by iyfiysi at 2021 Jun 16
+
+process_names:
+  - comm:
+    - short_url_gatew
+    - short_url_serve

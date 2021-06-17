@@ -22,12 +22,14 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0
 	github.com/json-iterator/go v1.1.11
+	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/platinummonkey/go-concurrency-limits v0.5.5
 	github.com/prometheus/client_golang v0.9.3
 	github.com/rakyll/statik v0.1.7
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72
 	github.com/spf13/viper v1.7.1
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
 	github.com/uber/jaeger-lib v2.2.0+incompatible
@@ -36,6 +38,7 @@ require (
 	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a
 	google.golang.org/grpc v1.36.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gopkg.in/yaml.v2 v2.2.8
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 

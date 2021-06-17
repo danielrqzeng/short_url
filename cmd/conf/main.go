@@ -1,9 +1,11 @@
-// gen by iyfiysi at 2021 May 19
+// gen by iyfiysi at 2021 Jun 16
 package main
 
 import (
 	"flag"
 	"fmt"
+	"github.com/logrusorgru/aurora"
+	"github.com/spf13/viper"
 	"iyfiysi.com/short_url/internal/pkg/conf"
 	"os"
 	"strings"
@@ -12,7 +14,7 @@ import (
 //定义一个全局变量的命令行接收参数
 var (
 	etcdServerFlag = flag.String("etcd", "http://127.0.0.1:2379", `etcd server,split with "," if more than one etcd server`)
-	confKeyFlag    = flag.String("conf_key", "/short_url/config/app.yaml", `etcd conf key`)
+	confKeyFlag    = flag.String("conf_key", "/iyfiysi.com/short_url/config/app.yaml", `etcd conf key`)
 	confFlag       = flag.String("conf", "./conf/app.yaml", "configuration file")
 	versionFlag    = flag.Bool("version", false, "print the current version")
 )
@@ -31,9 +33,17 @@ func main() {
 		fmt.Printf("Version %v, commit %v, built at %v\n", version, commit, date)
 		os.Exit(0)
 	}
-	etcdServers := strings.Split(*etcdServerFlag, ",")
 
-	err := conf.PushConfigToRemote(etcdServers, *confKeyFlag, *confFlag)
+	//加载配置到viper
+	viper.SetConfigFile(*confFlag)
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	}
+
+	//将配置推送到etcd
+	etcdServers := strings.Split(*etcdServerFlag, ",")
+	err = conf.PushConfigToRemote(etcdServers, *confKeyFlag, *confFlag)
 	if err != nil {
 		panic(err)
 	}
@@ -41,5 +51,26 @@ func main() {
 	fmt.Println("update conf=" + *confFlag + " to " + *etcdServerFlag + " success")
 	cmd := `ETCDCTL_API=3 etcdctl get --prefix "` + *confKeyFlag + `"`
 	fmt.Println("etcd way to check is cmd=" + cmd)
+
+	//help之配置
+	fmt.Println("update conf=" + *confFlag + " to " + *etcdServerFlag + " success")
+	confCheckCmd := `ETCDCTL_API=3 etcdctl get --prefix "` + *confKeyFlag + `"`
+	fmt.Println("etcd way to check " + aurora.Red("configure").String() + " is cmd=" + aurora.Green(confCheckCmd).String())
+
+	//help之服务注册
+	serviceKey := viper.GetString("etcd.serviceKey")
+	serviceCmd := `ETCDCTL_API=3 etcdctl get --prefix "` + serviceKey + `"`
+	fmt.Println("etcd way to check " + aurora.Red("service").String() + " is cmd=" + aurora.Green(serviceCmd).String())
+
+	//help之监控
+	metricKey := viper.GetString("etcd.metricKey")
+	metricCmd := `ETCDCTL_API=3 etcdctl get --prefix "` + metricKey + `"`
+	fmt.Println("etcd way to check " + aurora.Red("metric").String() + " is cmd=" + aurora.Green(metricCmd).String())
+
+	//help之文档
+	swaggerKey := viper.GetString("etcd.swaggerKey")
+	swaggerCmd := `ETCDCTL_API=3 etcdctl get --prefix "` + swaggerKey + `"`
+	fmt.Println("etcd way to check " + aurora.Red("swagger").String() + " is cmd=" + aurora.Green(swaggerCmd).String())
+
 	return
 }
