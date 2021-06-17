@@ -15,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 5,
-  "iteration": 1623253106524,
+  "id": 3,
+  "iteration": 1623931104301,
   "links": [],
   "panels": [
     {
@@ -60,7 +60,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 11,
         "x": 0,
         "y": 1
       },
@@ -106,6 +106,108 @@
       "title": "活动进程",
       "transformations": [],
       "type": "gauge"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 11,
+        "x": 11,
+        "y": 1
+      },
+      "hiddenSeries": false,
+      "id": 32,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.5.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "sum(increase(gateway_http_total{project=\"$VarProject\",http_path=\"/encode/v1\"}[24h])) by (http_status)",
+          "interval": "",
+          "legendFormat": "encode",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(increase(gateway_http_total{http_method=\"GET\",http_status=\"302\"}[24h])) by (http_status) ",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "decode",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "最近一天编码解码总数统计",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "collapsed": false,
@@ -275,9 +377,18 @@
         {
           "exemplar": true,
           "expr": "sum(rate(gateway_http_total{project=\"$VarProject\",role=\"gateway\"}[$__interval])) by (http_status)",
+          "hide": true,
           "interval": "",
           "legendFormat": "{{http_status}}",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(increase(gateway_http_total{project=\"$VarProject\",role=\"gateway\"}[24h])) by (http_status)",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{http_status}}",
+          "refId": "B"
         }
       ],
       "thresholds": [],
@@ -1520,7 +1631,7 @@
       }
     }
   ],
-  "refresh": false,
+  "refresh": "5s",
   "schemaVersion": 27,
   "style": "dark",
   "tags": [],
@@ -1539,12 +1650,12 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "iyfiysi-iyfiysi.com/short_url",
   "uid": "",
-  "version": 16
+  "version": 3
 }
